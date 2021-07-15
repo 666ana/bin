@@ -10,7 +10,6 @@ install:
 	install -Dm0755 ipv6 ${path}/ipv6
 	install -Dm0755 file ${path}/file
 	install -Dm0755 rss ${path}/rss
-	install -Dm0755 rec ${path}/rec
 	install -Dm0755 g ${path}/g
 	install -Dm0755 gt ${path}/gt
 	install -Dm0755 ig ${path}/ig
