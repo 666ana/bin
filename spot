@@ -5,7 +5,6 @@ if [ $# -eq 0 ]
 then echo "spot [install, get]"
 fi
 program='https://codeload.github.com/spotDL/spotify-downloader/zip/master'
-musicpath=$HOME/Music
 
 case "$1" in
 install)

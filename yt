@@ -1,7 +1,5 @@
 #!/bin/sh 
 # youtube-dl wrapper.
-musicpath=$HOME/Music
-videopath=$HOME/Videos
 if [ $# -eq 0 ]; then echo "yt [mp3, mp4]" ; fi
 
 case "$1" in

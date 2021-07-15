@@ -1,7 +1,5 @@
 #!/bin/sh
 # get all content from a instagram account
-path=$HOME/Pictures
-
 if [ $# -eq 0 ]
 then echo "ig [install, get]"
 fi
@@ -17,8 +15,8 @@ pip3 install instagram-scraper ; fi
 ;;
 
 get)
-mkdir -p $path/"$2"
-instagram_scraper "$2" --media-metadata -d $path/"$2"/
+mkdir -p $photopath/"$2"
+instagram_scraper "$2" --media-metadata -d $photopath/"$2"/
 fi
 ;;
 esac

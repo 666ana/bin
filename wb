@@ -1,6 +1,5 @@
 #!/bin/sh
 # get all content from wayback machine
-path=$HOME/Documents
 if [ $# -eq 0 ]; then echo "wb [install, get]" ; fi
 
 case "$1" in
@@ -13,8 +12,8 @@ gem install wayback_machine_downloader
 ;;
 
 get)
-mkdir -p $path/"$2"
-wayback_machine_downloader $2 -a -d $path/$2
+mkdir -p $docpath/"$2"
+wayback_machine_downloader $2 -a -d $docpath/$2
 fi
 ;;
 esac

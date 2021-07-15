@@ -2,15 +2,11 @@
 # opens files
 
 	case $1 in 
-		*.avi|*.png|*.gif|*.jpe|*.jpeg|*.jpg|*.mp4|*.mkv|*.mkv|*.mov|*.webm)
-		 mpv "$1" ;;
-        *.mp3)
-        if command -v rhythmbox >/dev/null ; then rhythmbox "$1" 
-        else mpv "$1" ; fi ;;
+		*.avi|*.png|*.gif|*.mp3|*.jpe|*.jpeg|*.jpg|*.mp4|*.mkv|*.mkv|*.mov|*.webm)
+		$media "$1" ;;
 		*.pdf)
 		if command -v mupdf >/dev/null ; then mupdf "$1" 
-        else librewolf "$1" ; fi ;;
+        else $browser "$1" ; fi ;;
 		*.sh|*.c|*.php|*.css|*.html|*.json|*)
-        if command -v vscodium >/dev/null ; then vscodium "$1" 
-        else st -e vim "$1" ; fi ;;
+        $editor "$1" ;;
     esac
