@@ -1,0 +1,63 @@
+#!/bin/sh
+# simple portable package wrapper.
+
+if [ $# -eq 0 ]; then echo "pkg [upd, upd, list, rem]" ; fi
+checkexec() {
+command -v "$1" > /dev/null
+}
+list="packages installed"
+
+case $1 in
+ins)
+if checkexec apt; then sudo apt-get install "$2"
+elif checkexec yay; then yay -S "$2"
+elif checkexec xbps-install; then sudo xbps-install -S "$2"
+elif checkexec brew; then brew install "$2"
+elif checkexec kiss; then kiss install "$2"
+elif checkexec eopkg; then eopkg it "$2"
+elif checkexec emerge; then emerge "$2"
+elif checkexec slackpkg; then slackpkg install "$2"
+elif checkexec dnf; then dnf install "$2"
+elif checkexec zypper; then sudo zypper source-install "$2"
+elif checkexec apk; then sudo apk add "$2" ; fi
+;;
+rem)
+if checkexec brew; then brew remove "$2"
+elif checkexec apt; then sudo apt-get purge "$2"
+elif checkexec kiss; then kiss remove "$2"
+elif checkexec eopkg; then eopkg remove "$2"
+elif checkexec yay; then yay -Rncs "$2"
+elif checkexec emerge; then emerge --unmerge "$2"
+elif checkexec xbps-install; then sudo xbps-remove -Rcns "$2"
+elif checkexec slackpkg; then slackpkg remove "$2"
+elif checkexec dnf; then sudo dnf remove "$2" 
+elif checkexec zypper; then sudo zypper remove "$2"
+elif checkexec apk; then sudo apk del "$2" ; fi
+;; 
+list)
+if checkexec brew; then echo "$(brew list | wc -l | tr -d ' ') $list"
+elif checkexec apt; then echo "$(dpkg -l | wc -l) $list"
+elif checkexec yay; then echo "$(pacman -Q | wc -l) $list"
+elif checkexec kiss; then echo "$(kiss list | wc -l) $list"
+elif checkexec eopkg; then echo "$(eopkg list | wc -l) $list"
+elif checkexec emerge; then echo "$(emerge list | wc -l) $list"
+elif checkexec slackpkg; then echo "$(slackpkg list | wc -l) $list"
+elif checkexec xbps-install; then echo "$(xbps-query -l | wc -l) $list"
+elif checkexec dnf; then echo "$(sudo dnf list installed | wc -l) $list"
+elif checkexec zypper; then echo "$(zypper packages --installed-only | wc -l) $list"
+elif checkexec apk; then echo "$(apk list | wc -l) $list" ; fi
+;;
+upd)
+if checkexec yay; then yay -Syyu
+elif checkexec apt; then sudo apt-get upgrade && sudo apt-get update
+elif checkexec xbps-install; then sudo xbps-install -Su
+elif checkexec brew; then brew update
+elif checkexec eopkg; then eopkg upgrade
+elif checkexec slackpkg; then slackpkg  upgrade-all
+elif checkexec emerge; then emerge --update --deep --with-bdeps=y --newuse @world
+elif checkexec zypper; then sudo zypper update
+elif checkexec kiss; then kiss update
+elif checkexec apk; then sudo apk update
+elif checkexec dnf; then sudo dnf upgrade ; fi
+;;
+esac

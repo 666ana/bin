@@ -1,0 +1,20 @@
+#!/bin/sh
+# get all content from wayback machine
+path=$HOME/Documents
+if [ $# -eq 0 ]; then echo "wb [install, get]" ; fi
+
+case "$1" in
+install)
+if command -v  pacman >/dev/null ; then 
+sudo pacman -S ruby
+elif command -v apt >/dev/null ; then 
+sudo sudo apt-get install ruby-full; fi
+gem install wayback_machine_downloader 
+;;
+
+get)
+mkdir -p $path/"$2"
+wayback_machine_downloader $2 -a -d $path/$2
+fi
+;;
+esac

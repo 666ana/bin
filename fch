@@ -1,0 +1,103 @@
+
+#!/bin/sh
+# a system fetch for linux.
+
+
+{
+c1='[31m'; c2='[32m'
+c3='[33m'; c4='[34m'
+c5='[35m'; c6='[36m'
+c7='[37m'; c8='[38m'	
+}
+
+
+# --------------- fetch config ---------------
+
+logo() {
+  echo "${c6}"
+}
+type() {
+  echo "${c6}"
+}
+value() {
+  echo "${c5}"
+}
+spacercolor() {
+  echo "${c1}"
+}
+spacer() {
+  echo ": "
+}
+at() {
+  echo "${c1}"
+}
+host() {
+  echo "${c5}"
+}
+usr() {
+  echo "${c1}"
+}
+
+# --------------- main code ---------------
+
+kernel() {
+uname -r
+}
+
+cpu() {
+grep 'model name' /proc/cpuinfo | uniq | cut -c 14- | tr '[A-Z]' '[a-z]'
+}
+
+p() {
+ps -e | wc -l
+}
+
+mem() { 
+free -h | sed -n '2{p;q}' | awk '{print $3 "/" $2}' | tr -d 'i' | tr '[A-Z]' '[a-z]'
+}
+
+disk() {
+df -h "/home" | awk ' /[0-9]/ {print $3 "/" $2}' |  tr '[A-Z]' '[a-z]'
+}
+
+up() {
+uptime -p | tr -d ' eekayoursinutesup' | tr ',' ' '
+}
+
+os() {
+grep PRETTY /etc/os-release | cut -c 13- | tr -d '"' | tr '[A-Z]' '[a-z]'
+}
+
+model() {
+cat /sys/devices/virtual/dmi/id/product_family | tr '[A-Z]' '[a-z]'
+}
+
+pkgs() {
+if command -v brew > /dev/null ; then echo "$(brew list | wc -l | tr -d ' ') (brew)"
+elif command -v apt > /dev/null; then echo "$(dpkg -l | wc -l) (dpkg)"
+elif command -v pacman > /dev/null; then echo "$(pacman -Q | wc -l) (pacman)"
+elif command -v kiss > /dev/null; then echo "$(kiss list | wc -l) (kiss)"
+elif command -v eopkg > /dev/null; then echo "$(eopkg list | wc -l) (eopkg)"
+elif command -v emerge > /dev/null; then echo "$(emerge list | wc -l) (emerge)"
+elif command -v slackpkg > /dev/null; then echo "$(slackpkg list | wc -l) (slackpkg)"
+elif command -v xbps-install > /dev/null; then echo "$(xbps-query -l | wc -l) (xbps)"
+elif command -v dnf > /dev/null; then echo "$(sudo dnf list installed | wc -l) (dnf)"
+elif command -v zypper > /dev/null; then echo "$(zypper packages --installed-only | wc -l) (zypper)"
+elif command -v apk > /dev/null; then echo "$(apk list | wc -l) (apk)" ; fi
+}
+
+cat <<a
+$(logo)
+
+      $(usr)${USER:-`id -nu`}$(at)@$(host)${HOSTNAME:-`hostname`}$(logo)    
+      $(type)-------------------
+      $(type)os$(spacercolor)$(spacer)$(value)$(os)$(logo) 
+      $(type)model$(spacercolor)$(spacer)$(value)$(model)$(logo) 
+      $(type)kernel$(spacercolor)$(spacer)$(value)$(kernel)$(logo) 
+      $(type)pkgs$(spacercolor)$(spacer)$(value)$(pkgs)$(logo) 
+      $(type)procs$(spacercolor)$(spacer)$(value)$(p)$(logo) 
+      $(type)uptime$(spacercolor)$(spacer)$(value)$(up)$(logo) 
+      $(type)mem$(spacercolor)$(spacer)$(value)$(mem)$(logo) 
+  
+
+a

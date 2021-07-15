@@ -1,0 +1,9 @@
+#!/bin/sh
+# use fuzzy finder to open files.
+s() {
+sed "s/^/'/ ; s/$/'/g"
+}
+f() {
+du -a ~/Videos | awk '{print $2}' | fzf | s
+}
+st -e f | xargs -r open &

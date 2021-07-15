@@ -1,0 +1,11 @@
+#!/bin/sh
+# just some aliases.
+
+if [ $# -eq 0 ]; then echo "gt [p, c, a, cl]" ; fi
+
+case $1 in
+	p) git push ;;
+	a) git add ;;
+	c) git commit -m "pushed $(date +%s)" ;;
+	cl) git clone "$2" ;;
+esac

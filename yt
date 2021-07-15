@@ -1,0 +1,28 @@
+#!/bin/sh 
+# youtube-dl wrapper.
+musicpath=$HOME/Music
+videopath=$HOME/Videos
+if [ $# -eq 0 ]; then echo "yt [mp3, mp4]" ; fi
+
+case "$1" in
+
+mp3)
+read -p 'is this a playlist? ' response
+if [ $response = 'y' ]; then 
+read -p 'name? ' response2
+path=$musicpath/$response2 
+elif [ $response = 'n' ]; then path=$musicpath ; fi
+youtube-dl  -x --audio-format mp3 "$2" -4 -o $path/'%(title)'s.'%(ext)'s
+;;
+
+mp4)
+read -p 'is this a playlist? ' response
+if [ $response = 'y' ]; then 
+read -p 'name? ' response2
+path=$videopath/$response2 
+elif [ $response = 'n' ]; then path=$videopath ; fi
+youtube-dl  "$2" --format mp4 -4 -o $path/'%(title)'s.'%(ext)'s
+;;
+esac
+
+

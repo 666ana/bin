@@ -1,0 +1,24 @@
+#!/bin/sh
+# nu ported to using dmenu,
+
+choosen=$(printf "uuid\nrandom\nnumbers\nletters\npassword\nparagraph" | dmenu -p " Generate random characters: ")
+r=$((RANDOM %100+5)) l=$((RANDOM %6+2)) l2=$((RANDOM %5+1)) p=$((RANDOM %25+50))
+cb() {
+if command -v xclip >/dev/null ; then xclip -selection clipboard ; fi
+}
+if [ -z $choosen ]; then exit 1; fi
+
+case "$choosen" in
+uuid)
+od -x /dev/urandom | head -1 | awk '{OFS="-"; print $2$3,$4,$5,$6,$7$8$9}' | cb ;;
+random)
+cat /dev/urandom | tr -dc "[:alnum:]" | head -c$r | cb ;;
+letters)
+cat /dev/urandom | tr -dc "[:alpha:]" | head -c$r | cb ;;
+numbers)
+cat /dev/urandom | tr -dc "[:digit:]" | head -c$r | cb ;;
+password)
+cat /dev/urandom | tr -dc "[:alnum:]!@#$%^&*()-+=_[]{}?,<>" | head -c$p | cb ;;
+paragraph)
+curl -Ls 'http://metaphorpsum.com/paragraphs/'$l'/'$l2'' | cb ;;
+esac

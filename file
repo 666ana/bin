@@ -1,0 +1,14 @@
+#!/bin/sh
+# so i can upload files to my servers and it returns me a link.
+
+server=$(server main) link=$(server 1) path=$(server path)
+if [ $# -eq 0 ]; then echo "f [link, push, pull]" ; fi
+
+case "$1" in
+pull)
+scp -r $server:$2 $3
+;;
+push)
+rsync -rv $2 $server:$3
+;;
+esac

@@ -1,0 +1,25 @@
+#!/bin/sh
+# a simple script that makes links into a rss one to paste into a rss reader.
+
+if [ $# -eq 0 ]; then echo "rss [yt, rt, git]" ; fi
+
+case "$1" in
+yt)
+if [[ ${2} = *"https://"* ]]; then
+echo https://youtube.com/feeds/videos.xml?channel_id=$(echo $2 | cut -c 33-) | xclip -selection clipboard
+elif [[ ${2} != *"https://"* ]]; then
+echo https://youtube.com/feeds/videos.xml?channel_id=$2 | xclip -selection clipboard ; fi
+;;
+rt)
+if [[ ${2} != *"https://"* ]]; then
+echo https://www.reddit.com/r/$2.xml | xclip -selection clipboard
+elif [[ ${2} = *"https://"* ]]; then
+echo https://www.reddit.com/r/$(echo $2 | sed 's/.\{1\}$//' | cut -c 26-).xml | xclip -selection clipboard ; fi
+;;
+git)
+if [[ ${2} != *"https://"* ]]; then
+echo https://github.com/$2.atom | xclip -selection clipboard
+elif [[ ${2} = *"https://"* ]]; then
+echo $2.atom | xclip -selection clipboard ; fi
+;;
+esac

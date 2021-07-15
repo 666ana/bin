@@ -1,0 +1,5 @@
+#!/bin/sh
+path=$HOME/.Xresources
+
+xrdb -remove $path
+xrdb -merge $path

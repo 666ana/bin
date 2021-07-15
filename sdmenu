@@ -1,0 +1,10 @@
+#!/bin/sh
+# s ported to using dmenu,
+
+choosen=$(printf "main" | dmenu -p " SSH menu: ")
+if [ -z $choosen ]; then exit 1; fi
+
+case "$choosen" in
+main)
+st -e ssh $(server main) & ;;
+esac

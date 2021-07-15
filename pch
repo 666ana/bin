@@ -1,0 +1,11 @@
+#!/bin/sh
+# easily patch suckless software.
+s() {
+sed 's/^[^=]*st-// ; s/^[^=]*dwm-// ; s/^[^=]*dmenu-//'
+}
+path=$PWD/patches
+pa=$path/$(echo $1 | s)
+
+mkdir -p $path
+curl -Ls $1 >> $pa
+patch -p1 < $pa

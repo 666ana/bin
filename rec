@@ -1,0 +1,117 @@
+#!/bin/sh
+# deps: ffmpeg, slop, xclip
+# credit mitchweaver https://github.com/mitchweaver
+
+server=$(server main) link=$(server 1) path=$(server path)
+if [ $# -eq 0 ]; then echo "rec [link, start]" ; fi
+if [ -d "$HOME/vids" ]; then mkdir -p $HOME/vids/recs/ ; else >/dev/null ; fi
+if [ -d "$HOME/Videos" ]; then mkdir -p $HOME/Videos/Recordings/ ; else >/dev/null ; fi
+
+
+: "${RECORD_FRAMERATE:=30}"
+
+
+mkdir -p /tmp/record
+sock=/tmp/record/sock
+pidfile=/tmp/record/pidfile
+varrandom=$(cat /dev/urandom | tr -dc "[:alnum:]" | head -c15)
+
+
+msg() { printf '* %s\n' "$*" ; }
+die() { >&2 msg "$*" ; exit 1 ; }
+
+usage() {
+    die "Usage: ${0##*/} [-o output dir] [-r rate] [-f foreground]"
+}
+
+isrunning() { kill -0 "$(getpid)" 2>/dev/null ; return $? ; }
+
+getpid() {
+    [ -s $pidfile ] && read -r pid <$pidfile
+    echo "${pid:-?}"
+}
+
+start() {
+    isrunning && die "another instance already exists: $(getpid)"
+
+if [ -d "$HOME/Videos/Recordings" ]; then
+file="$HOME/Videos/Recordings/$varrandom.mp4"
+elif [ -d "$HOME/vids/recs" ]; then
+file="$HOME/Videos/recs/$varrandom.mp4"
+fi
+
+    :>$sock
+
+    if command -v xrectsel >/dev/null ; then
+        xrectsel -f '%x %y %w %h'
+    elif command -v slop >/dev/null ; then
+        slop -f '%x %y %w %h'
+    else
+        die 'needs xrectsel or slop'
+    fi | {
+        read -r x y w h
+
+        <$sock ffmpeg -y -f x11grab -s "${w}x${h}" -r $RECORD_FRAMERATE \
+        -i "${DISPLAY:-:0}+${x},${y}" -f alsa -i default -vcodec libx264 \
+        -pix_fmt yuv420p -filter:v "crop=iw-mod(iw\\,2):ih-mod(ih\\,2)" \
+        "$file" >/tmp/record/log 2>&1 &
+
+        msg "recording on pid $!"
+
+        if ${FOREGROUND:-false} ; then
+            trap 'rm "$sock" /tmp/record/log 2>/dev/null ||: ; rmdir /tmp/record 2>/dev/null ||:' EXIT INT TERM
+            wait
+        else
+            echo $! >$pidfile
+            echo "$file" >/tmp/record/file
+        fi
+    }
+}
+
+end() {
+    if isrunning ; then
+        echo q >>$sock
+        rm /tmp/record/* 2>/dev/null ||:
+        rmdir /tmp/record 2>/dev/null ||:
+        exit
+    else
+        die 'nothing being recorded'
+    fi
+}
+
+toggle2() {
+    if isrunning ; then
+        read -r name </tmp/record/file
+        msg "saved as $name"
+        rsync -rv $name $server:$path/v/ | end
+        if [ -d "$HOME/vids/recs" ]; then
+        c=$(echo $name | cut -c 21- )
+        echo "$link/v/$c" | xclip -selection clipboard
+        elif [ -d "$HOME/Videos/Recordings" ]; then
+        c=$(echo $name | cut -c 29- )
+        echo "$link/v/$c" | xclip -selection clipboard
+        fi
+    else
+        start
+    fi
+}
+
+toggle1() {
+    if isrunning ; then
+        read -r name </tmp/record/file
+        echo "saved as '$name'"
+        end
+    else
+        start
+    fi
+}
+
+
+case "$1" in
+start)
+toggle1
+;;
+link)
+toggle2
+;;
+esac

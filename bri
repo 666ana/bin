@@ -1,0 +1,15 @@
+#!/bin/sh
+brightness=$(xbacklight | sed 's/[.*].*//')
+nof() {
+dunstify "brightness: $brightness%"; exit
+}
+
+case "$1" in
+i)
+xbacklight +10 ;;
+d)
+xbacklight -10  ;;
+s)
+echo " $brightness%"
+;;
+esac

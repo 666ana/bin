@@ -1,0 +1,28 @@
+#!/bin/sh
+# download from spotify.
+
+if [ $# -eq 0 ]
+then echo "spot [install, get]"
+fi
+program='https://codeload.github.com/spotDL/spotify-downloader/zip/master'
+musicpath=$HOME/Music
+
+case "$1" in
+install)
+if command -v  pacman >/dev/null ; then 
+sudo pacman -S python-pip
+sudo pip install $program
+elif command -v apt >/dev/null ; then 
+sudo apt-get install python3-pip
+sudo pip3 install $program ; fi
+;;
+
+get)
+read -p 'is this a playlist? ' response
+if [ $response = 'y' ]; then 
+read -p 'name? ' response2
+path=$musicpath/$response2 
+elif [ $response = 'n' ]; then path=$musicpath ; fi
+spotdl "$2" --ignore-ffmpeg-version -o $path
+;;
+esac
